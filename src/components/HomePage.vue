@@ -8,6 +8,7 @@ function goToLogin() {
 }
 </script>
 
+<!-- Altes Design -->
 <!-- <template>
   <div class="home">
     <h1>Welcome to U‑Health!</h1>

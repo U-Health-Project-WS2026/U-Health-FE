@@ -1,4 +1,4 @@
-<template>
+<!--<template>
   <div class="login-page">
     <h2>Login</h2>
     <form @submit.prevent="onLogin">
@@ -15,6 +15,59 @@
     </form>
   </div>
 </template>
+-->
+
+<template>
+  <div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
+      <div class="card-body p-4">
+        <h3 class="card-title text-center mb-3">Login</h3>
+
+        <form @submit.prevent="onLogin">
+          <!-- E‑Mail -->
+          <div class="mb-3">
+            <label for="email" class="form-label">E‑Mail</label>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              v-model="email"
+              required
+            />
+          </div>
+
+          <!-- Passwort -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Passwort</label>
+            <input
+              id="password"
+              type="password"
+              class="form-control"
+              v-model="password"
+              required
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary w-100">
+            Einloggen
+          </button>
+
+          <!-- Fehleranzeige -->
+          <p v-if="error" class="text-danger text-center mt-2">{{ error }}</p>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+
+
+
+
+
+
 
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -44,6 +97,9 @@ async function onLogin() {
   }
 }
 </script>
+
+
+
 
 <style scoped>
 .login-page {
