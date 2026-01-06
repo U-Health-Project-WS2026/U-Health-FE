@@ -1,1 +1,59 @@
-node_modules
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dependencies
+/.pnp
+.pnp.js
+
+# build outputs
+/dist
+/build
+
+# local env files
+.env
+.env.local
+.env.*.local
+
+# Lockfiles (optional if you use package-lock.json or yarn.lock)
+/package-lock.json
+# Uncomment if you prefer to ignore yarn.lock
+# /yarn.lock
+
+# Vite cache
+node_modules/.vite
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs
+*.log
+
+# system files
+Thumbs.db
+
+# VS Code workspace history
+.history/
+
+# coverage
+coverage/
+
+# Pinia / local cache
+*.localstorage
+
+# Misc
+*.tmp
