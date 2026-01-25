@@ -9,28 +9,34 @@
 </script>
 
 <template>
-  <!--
-  <p>Test – App läuft</p>
-
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-  -->
-
   <div id="app">
     <!-- Navigation -->
-    <nav>
-      <router-link to="/">Home</router-link>
-      <router-link to="/login">Login</router-link>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
+      <div class="container-fluid">
+        <!-- Links left -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link class="nav-link" to="/">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/login">Login</router-link>
+          </li>
+        </ul>
+
+        <!-- Profil-Button oben rechts -->
+        <button
+          class="btn btn-outline-primary d-flex align-items-center"
+          @click="$router.push('/profile')"
+        >
+          <i class="bi bi-person-square me-1"></i>
+          Profile
+        </button>
+      </div>
     </nav>
 
     <!-- Hier zeigt der Router die jeweils passende View an -->
     <router-view />
   </div>
-
-  <!-- Button -->
-  <!-- <button @click="goToLogin">Login</button> -->
 </template>
 
 <style scoped>
