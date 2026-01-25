@@ -28,12 +28,12 @@ function goToLogin() {
   <div class="container text-center mt-5">
     <!-- Hero‑Bereich -->
     <div class="p-5 bg-light rounded shadow-sm">
-      <h1 class="display-4 text-primary">Willkommen bei U‑Health!</h1>
+      <h1 class="display-4 text-primary">Welcome to U‑Health!</h1>
       <p class="lead text-secondary">
-        Deine Gesundheit im Blick — einfach, digital und komfortabel.
+        Keep track of your health — easily, digitally, and conveniently.
       </p>
 
-      <button class="btn btn-primary btn-lg" @click="goToLogin">Zum Login</button>
+      <button class="btn btn-primary btn-lg" @click="goToLogin">To log in</button>
     </div>
 
     <!-- Feature‑Sektion -->
@@ -41,24 +41,24 @@ function goToLogin() {
       <div class="col-md-4">
         <div class="card border-info mb-3">
           <div class="card-body">
-            <h5 class="card-title">Termin buchen</h5>
-            <p class="card-text">Buche schnell und einfach deinen nächsten Termin online.</p>
+            <h5 class="card-title">Book an appointment</h5>
+            <p class="card-text">Book your next appointment quickly and easily online.</p>
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card border-success mb-3">
           <div class="card-body">
-            <h5 class="card-title">Arzt finden</h5>
-            <p class="card-text">Finde die passenden Ärzte und Fachrichtungen in deiner Nähe.</p>
+            <h5 class="card-title">Find a doctor</h5>
+            <p class="card-text">Find the right doctors and specialties.</p>
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card border-warning mb-3">
           <div class="card-body">
-            <h5 class="card-title">Gesundheitsinfos</h5>
-            <p class="card-text">Erhalte wertvolle Tipps rund um deine Gesundheit.</p>
+            <h5 class="card-title">Health information</h5>
+            <p class="card-text">Get valuable tips on all aspects of your health.</p>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@
 
 <template>
   <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
+    <div class="card shadow-sm" style="max-width: 400px; width: 100%">
       <div class="card-body p-4">
         <h3 class="card-title text-center mb-3">Login</h3>
 
@@ -27,47 +27,25 @@
           <!-- E‑Mail -->
           <div class="mb-3">
             <label for="email" class="form-label">E‑Mail</label>
-            <input
-              id="email"
-              type="email"
-              class="form-control"
-              v-model="email"
-              required
-            />
+            <input id="email" type="email" class="form-control" v-model="email" required />
           </div>
 
           <!-- Passwort -->
           <div class="mb-3">
             <label for="password" class="form-label">Passwort</label>
-            <input
-              id="password"
-              type="password"
-              class="form-control"
-              v-model="password"
-              required
-            />
+            <input id="password" type="password" class="form-control" v-model="password" required />
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" class="btn btn-primary w-100">
-            Einloggen
-          </button>
+          <button type="submit" class="btn btn-primary w-100">Einloggen</button>
 
           <!-- Fehleranzeige -->
           <p v-if="error" class="text-danger text-center mt-2">{{ error }}</p>
         </form>
-
       </div>
     </div>
   </div>
 </template>
-
-
-
-
-
-
-
 
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -85,21 +63,18 @@ async function onLogin() {
   try {
     const response = await axios.post('/api/login', {
       email: email.value,
-      password: password.value
+      password: password.value,
     })
     const token = response.data.token
     localStorage.setItem('token', token)
     // optional: setze in Pinia-Store, falls du Auth-State global speichern willst
-    router.push('/timeslots')  // nach dem Login weiterleiten
+    router.push('/timeslots') // nach dem Login weiterleiten
   } catch (e) {
     error.value = 'Login fehlgeschlagen. Bitte versuche es erneut.'
     console.error(e)
   }
 }
 </script>
-
-
-
 
 <style scoped>
 .login-page {
