@@ -1,22 +1,3 @@
-<!--<template>
-  <div class="login-page">
-    <h2>Login</h2>
-    <form @submit.prevent="onLogin">
-      <div>
-        <label for="email">E-Mail</label>
-        <input id="email" type="email" v-model="email" required />
-      </div>
-      <div>
-        <label for="password">Passwort</label>
-        <input id="password" type="password" v-model="password" required />
-      </div>
-      <button type="submit">Einloggen</button>
-      <p v-if="error" class="error">{{ error }}</p>
-    </form>
-  </div>
-</template>
--->
-
 <template>
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-sm" style="max-width: 400px; width: 100%">
@@ -24,84 +5,105 @@
         <h3 class="card-title text-center mb-3">Login</h3>
 
         <form @submit.prevent="onLogin">
-          <!-- E‑Mail -->
+          <!-- E-Mail -->
           <div class="mb-3">
-            <label for="email" class="form-label">E‑Mail</label>
-            <input id="email" type="email" class="form-control" v-model="email" required />
+            <label for="email" class="form-label">E-Mail</label>
+            <input
+              id="email"
+              type="email"
+              class="form-control"
+              v-model="email"
+              required
+            />
           </div>
 
           <!-- Passwort -->
           <div class="mb-3">
             <label for="password" class="form-label">Passwort</label>
-            <input id="password" type="password" class="form-control" v-model="password" required />
+            <input
+              id="password"
+              type="password"
+              class="form-control"
+              v-model="password"
+              required
+            />
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" class="btn btn-primary w-100">Einloggen</button>
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            :disabled="loading"
+          >
+            {{ loading ? "Login..." : "Einloggen" }}
+          </button>
 
           <!-- Fehleranzeige -->
           <p v-if="error" class="text-danger text-center mt-2">{{ error }}</p>
         </form>
+
+        <!-- Link zur Registrierung -->
+        <div class="text-center mt-3">
+          <span>Noch nicht registriert?</span>
+          <button class="btn btn-link p-0" @click="goToRegister">
+            Jetzt registrieren
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import api from "@/api"
+import axios from "axios"
 
-const email = ref('')
-const password = ref('')
-const error = ref('')
+
+const email = ref("")
+const password = ref("")
+const error = ref("")
+const loading = ref(false)
 
 const router = useRouter()
 
 async function onLogin() {
-  error.value = ''
+  error.value = ""
+  loading.value = true
+
   try {
-    const response = await axios.post('/api/login', {
+    const response = await api.post("/v1/login", {
       email: email.value,
       password: password.value,
     })
+
     const token = response.data.token
-    localStorage.setItem('token', token)
-    // optional: setze in Pinia-Store, falls du Auth-State global speichern willst
-    router.push('/timeslots') // nach dem Login weiterleiten
-  } catch (e) {
-    error.value = 'Login fehlgeschlagen. Bitte versuche es erneut.'
-    console.error(e)
+    localStorage.setItem("token", token)
+
+    router.push("/dashboard")
+  } catch (err: unknown) {
+
+
+    if (axios.isAxiosError(err)) {
+      error.value = err.response?.data?.message ?? "Login fehlgeschlagen."
+    } else {
+      error.value = "Ein unerwarteter Fehler ist aufgetreten."
+    }
+
+
+
+
+  } finally {
+    loading.value = false
   }
+}
+
+function goToRegister() {
+  router.push("/register")
 }
 </script>
 
 <style scoped>
-.login-page {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.login-page label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
-.login-page input {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.login-page button {
-  padding: 0.6rem 1.2rem;
-}
-
-.error {
-  color: red;
-  margin-top: 1rem;
-}
+/* optional weitere Styles */
 </style>
