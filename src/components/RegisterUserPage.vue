@@ -34,10 +34,10 @@
           <div class="mb-3">
             <label class="form-label">Sex</label>
             <select v-model="sex" class="form-select" required>
-              <option value="" disabled>Bitte wählen</option>
-              <option value="male">Männlich</option>
-              <option value="female">Weiblich</option>
-              <option value="other">Andere</option>
+              <option :value="null" disabled>Bitte wählen</option>
+              <option :value="1">Männlich</option>
+              <option :value="0">Weiblich</option>
+              <option :value="2">Divers</option>
             </select>
           </div>
 

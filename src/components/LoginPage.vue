@@ -80,6 +80,7 @@ async function onLogin() {
 
     const token = response.data.token
     localStorage.setItem("token", token)
+    await router.push("/dashboard")
 
     router.push("/dashboard")
   } catch (err: unknown) {

@@ -3,52 +3,43 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: 'http://localhost:8000/api',
   headers: {
-    Accept: 'application/json',
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
   },
 })
 
 
-// Token automatisch mitsenden
+// Request Interceptor: Token mitsenden
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
+
   if (token) {
-    // Sicherstellen, dass payload existiert
-    const parts = token.split('.')
-    const base64Payload = parts.length > 1 ? parts[1] : null
-
-    if (!base64Payload) {
-      // Kein gültiger JWT
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-      throw new axios.Cancel('Token invalid')
-    }
-
-    const payload = JSON.parse(atob(base64Payload))
-    const expiresAt = payload.exp * 1000
-
-    if (Date.now() > expiresAt) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-      throw new axios.Cancel('Token expired')
-    }
     config.headers.Authorization = `Bearer ${token}`
   }
+
   return config
+}, (error) => {
+  return Promise.reject(error)
 })
 
-export default api
 
 
-
-// Response Interceptor
-// Auto-Logout beim Token-Expiry auch während des API-Calls
+// Response Interceptor: Fehlerbehandlung (401 Unauthorized)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Wenn der Server 401 meldet, ist der Token abgelaufen oder ungültig
     if (error.response?.status === 401) {
+      console.warn("Sitzung abgelaufen oder nicht autorisiert.")
       localStorage.removeItem('token')
-      window.location.href = '/login'
+
+      // Nur umleiten, wenn wir nicht sowieso schon auf der Login-Seite sind
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
-  },
+  }
 )
+
+export default api

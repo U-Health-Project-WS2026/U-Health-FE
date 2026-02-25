@@ -1,60 +1,47 @@
 <script setup lang="ts">
-//import { useRouter } from 'vue-router'
-//
-//const router = useRouter()
-//
-//function goToLogin() {
-//  router.push('/login')
-//}
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 </script>
 
 <template>
   <div id="app">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
+    <nav v-if="route.meta.showNav" class="navbar navbar-expand-lg navbar-dark bg-primary px-3 shadow-sm">
       <div class="container-fluid">
-        <!-- Links left -->
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/">Home</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/login">Login</router-link>
-          </li>
-        </ul>
+        <router-link class="navbar-brand fw-bold" to="/">U-Health</router-link>
 
-        <!-- Profil-Button oben rechts -->
+        <div class="navbar-nav me-auto">
+          <router-link class="nav-link" to="/">Home</router-link>
+          <router-link v-if="!route.meta.requiresAuth" class="nav-link" to="/login">Login</router-link>
+          <router-link v-if="route.meta.requiresAuth" class="nav-link" to="/dashboard">Dashboard</router-link>
+        </div>
+
         <button
-          class="btn btn-outline-primary d-flex align-items-center"
+          v-if="route.meta.showProfile"
+          class="btn btn-light d-flex align-items-center rounded-pill px-3"
           @click="$router.push('/profile')"
         >
-          <i class="bi bi-person-square me-1"></i>
+          <i class="bi bi-person-circle me-2"></i>
           Profile
         </button>
       </div>
     </nav>
 
-    <!-- Hier zeigt der Router die jeweils passende View an -->
     <router-view />
   </div>
 </template>
 
 <style scoped>
-/* einfache Styles für die Navigation */
-nav {
-  padding: 1rem;
-  background-color: #f0f0f0;
-  display: flex;
-  gap: 1rem;
+
+.navbar-brand {
+  letter-spacing: 0.5px;
 }
 
-router-link {
-  text-decoration: none;
-  color: #42b983;
-  font-weight: bold;
+.nav-link {
+  transition: opacity 0.2s;
 }
 
-router-link.router-link-active {
-  text-decoration: underline;
+.nav-link:hover {
+  opacity: 0.8;
 }
 </style>

@@ -8,72 +8,85 @@ function goToLogin() {
 }
 </script>
 
-<!-- Altes Design -->
-<!-- <template>
-  <div class="home">
-    <h1>Welcome to U‑Health!</h1>
-    <p>
-      Visit
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">
-        vuejs.org
-      </a>
-      to read the documentation.
-    </p>
-
-    <button @click="goToLogin">Go to Login</button>
-  </div>
-</template> -->
-
 <template>
-  <div class="container text-center mt-5">
-    <!-- Hero‑Bereich -->
-    <div class="p-5 bg-light rounded shadow-sm">
-      <h1 class="display-4 text-primary">Welcome to U‑Health!</h1>
-      <p class="lead text-secondary">
-        Keep track of your health — easily, digitally, and conveniently.
-      </p>
+  <div class="min-vh-100 bg-light py-5">
+    <div class="container">
 
-      <button class="btn btn-primary btn-lg" @click="goToLogin">To log in</button>
-    </div>
+      <div class="row justify-content-center mb-5">
+        <div class="col-lg-8 text-center">
+          <div class="p-5 shadow-lg rounded-4 bg-white border-0">
+            <h1 class="display-3 fw-bold text-primary mb-3">U‑Health</h1>
+            <p class="lead text-muted fs-4 mb-4">
+              Your health in digital hands — secure, fast, and transparent.
+            </p>
+            <button class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-sm hover-scale" @click="goToLogin">
+              Get Started / Login
+            </button>
+          </div>
+        </div>
+      </div>
 
-    <!-- Feature‑Sektion -->
-    <div class="row mt-4">
-      <div class="col-md-4">
-        <div class="card border-info mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Book an appointment</h5>
-            <p class="card-text">Book your next appointment quickly and easily online.</p>
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-5">
+          <div class="card h-100 border-0 shadow-sm transition-card">
+            <div class="card-body p-4 text-center">
+              <div class="icon-box bg-primary-subtle text-primary mb-3 mx-auto">
+                <i class="bi bi-calendar-check fs-2"></i>
+              </div>
+              <h3 class="card-title h4 fw-bold">Book an Appointment</h3>
+              <p class="card-text text-secondary">
+                Find the right time slot and book your next appointment in less than 2 minutes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-5">
+          <div class="card h-100 border-0 shadow-sm transition-card">
+            <div class="card-body p-4 text-center">
+              <div class="icon-box bg-success-subtle text-success mb-3 mx-auto">
+                <i class="bi bi-clock-history fs-2"></i>
+              </div>
+              <h3 class="card-title h4 fw-bold">Treatment History</h3>
+              <p class="card-text text-secondary">
+                Keep track of your past diagnoses, prescribed medications, and medical reports.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card border-success mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Find a doctor</h5>
-            <p class="card-text">Find the right doctors and specialties.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-warning mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Health information</h5>
-            <p class="card-text">Get valuable tips on all aspects of your health.</p>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
 
 <style scoped>
-.home {
-  text-align: center;
-  margin-top: 2rem;
+/* Custom Styles for extra polish */
+
+.icon-box {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.25rem;
 }
 
-button {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
+.transition-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.transition-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
 }
 </style>

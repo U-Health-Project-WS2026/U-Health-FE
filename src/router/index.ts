@@ -7,31 +7,42 @@ import TreatmentHistory from '@/components/TreatmentHistory.vue'
 import TreatmentDetail from '@/components/TreatmentDetail.vue'
 
 
-// Token Ablauf prüfen
+
+// Token Ablauf Prüfung für Sanctum (Opaque Tokens)
 function isTokenValid() {
   const token = localStorage.getItem("token")
-  if (!token) return false
-
-  try {
-    const base64Payload = token.split(".")[1]
-    if (!base64Payload) return false
-
-    const payload = JSON.parse(atob(base64Payload))
-    const expiresAt = payload.exp * 1000
-    return Date.now() < expiresAt
-  } catch {
-    return false
-  }
+  // Da es kein JWT ist, können wir nur prüfen, ob er da ist.
+  // Die Gültigkeit prüft der Server bei jedem Request.
+  return !!token;
 }
 
 
 const routes = [
-  { path: '/', component: HomePage },
-  { path: '/login', component: LoginPage },
-  { path: "/register", component: RegisterUserPage },
-  { path: '/dashboard', component: DashboardPage, meta: { requiresAuth: true } },
-  { path: '/history', component: TreatmentHistory, meta: { requiresAuth: true } },
-  { path: '/history/:id', name: 'TreatmentDetail', component: TreatmentDetail, meta: { requiresAuth: true } },
+  { path: '/',
+    component: HomePage,
+    meta: { showNav: true, showProfile: false }
+  },
+  { path: '/login',
+     component: LoginPage,
+    meta: { showNav: false }
+  },
+  { path: "/register",
+    component: RegisterUserPage,
+    meta: { showNav: false }
+  },
+  { path: '/dashboard',
+    component: DashboardPage,
+    meta: { requiresAuth: true, showNav: true, showProfile: true }
+  },
+  { path: '/history',
+    component: TreatmentHistory,
+    meta: { requiresAuth: true, showNav: true, showProfile: true }
+  },
+  { path: '/history/:id',
+    name: 'TreatmentDetail',
+    component: TreatmentDetail,
+    meta: { requiresAuth: true, showNav: true, showProfile: true }
+  },
   //    { path: '/book-appointment', component: BookAppointment },
   //    { path: '/cancel-appointment', component: CancelAppointment },
   //    { path: '/profile', component: ProfilePage },
@@ -50,10 +61,10 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !tokenValid) {
     // Kein gültiger Token → zur Login-Seite
     localStorage.removeItem("token")
-    next("/login")
+    return next("/login")
   }
 
-  // Wenn eingeloggt, verhindere Zugriff auf Login/Register
+  // Wenn eingeloggt und versucht /login oder /register aufzurufen
   else if ((to.path === '/login' || to.path === '/register') && tokenValid) {
     next("/dashboard")
   }
@@ -61,6 +72,7 @@ router.beforeEach((to, from, next) => {
   else {
     next()
   }
+
 })
 
 
