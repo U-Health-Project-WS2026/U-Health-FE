@@ -1,135 +1,118 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
+import api from '@/api'
 
 const route = useRoute()
 const router = useRouter()
-
-// Loading + Error States
 const loading = ref(true)
 const error = ref('')
 
+const treatment = ref<any>(null)
 
-// Treatment detail state
-const treatment = ref({
-  id: null as number | null,
-  date: '',
-  diagnosis: '',
-  treatment: '',
-  medication: '',
-  notes: ''
-})
-
-
-// Load Treatment from API
 async function loadTreatmentDetail() {
-
   loading.value = true
-  error.value = ''
-
   try {
-
     const id = route.params.id
-
-    const response = await axios.get(
-      `http://localhost:8000/api/treatments/${id}`
-    )
-
-    treatment.value = response.data
-
-  } catch (e) {
-
-    console.error(e)
-    error.value = 'Could not load treatment details.'
-
+    // Konsistente URL mit api.ts baseURL
+    const response = await api.get(`/v1/treatments/${id}`)
+    treatment.value = response.data.data || response.data
+  } catch {
+    error.value = 'Could not load treatment details. The record might not exist.'
   } finally {
-
     loading.value = false
-
   }
 }
 
-//async function loadTreatmentDetail() {
-//  try {
-//    const id = route.params.id
-//    // API call to fetch detail for this treatment
-//    const response = await axios.get(`/api/treatment-history/${id}`)
-//    treatment.value = response.data
-//  } catch (e) {
-//    error.value = 'Could not load treatment details.'
-//    console.error(e)
-//  }
-//}
-
-// Back Button
-function goBack() {
-  router.back()
-}
-
-
-// Date Formatting
-function formatDate(dateString: string) {
-
-  if (!dateString) return ''
-
-  return new Date(dateString).toLocaleDateString('de-DE', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   })
 }
-
-
 
 onMounted(loadTreatmentDetail)
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h2 class="text-center text-primary mb-4">Treatment Detail</h2>
+  <div class="min-vh-100 bg-light py-5">
+    <div class="container" style="max-width: 800px;">
 
-    <!-- Loading -->
-    <div v-if="loading" class="text-center">
-
-      <div class="spinner-border text-primary"></div>
-      <p>Loading treatment...</p>
-
-    </div>
-
-    <!-- Error -->
-    <div v-else-if="error" class="alert alert-danger text-center">
-      {{ error }}
-    </div>
-
-
-    <!-- Treatment Card -->
-    <div v-else class="card shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title">{{ formatDate(treatment.date) }}</h5>
-        <p class="card-text"><strong>Diagnosis:</strong> {{ treatment.diagnosis }}</p>
-        <p class="card-text"><strong>Treatment:</strong> {{ treatment.treatment }}</p>
-        <p class="card-text"><strong>Medication:</strong> {{ treatment.medication || '-' }}</p>
-        <p class="card-text"><strong>Notes:</strong> {{ treatment.notes || '-' }}</p>
-      </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-      <button class="btn btn-secondary" @click="goBack">
-        Back to History
+      <button @click="router.back()" class="btn btn-link text-decoration-none text-muted mb-4 p-0">
+        <i class="bi bi-arrow-left"></i> Back to History
       </button>
+
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div v-else-if="error" class="alert alert-danger rounded-4 shadow-sm">
+        <i class="bi bi-exclamation-octagon me-2"></i> {{ error }}
+      </div>
+
+      <div v-else class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-0 p-4 border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <span class="badge bg-primary mb-2">Medical Record</span>
+              <h2 class="fw-bold mb-0">{{ treatment.diagnosis }}</h2>
+              <p class="text-muted mb-0"><i class="bi bi-calendar3 me-2"></i>{{ formatDate(treatment.date) }}</p>
+            </div>
+            <div class="text-end d-none d-md-block">
+              <i class="bi bi-clipboard2-pulse fs-1 text-primary opacity-25"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="small text-muted text-uppercase fw-bold">Treatment Performed</label>
+              <p class="fs-5 fw-semibold">{{ treatment.treatment }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="small text-muted text-uppercase fw-bold">Prescribed Medication</label>
+              <p class="fs-5 fw-semibold text-primary">
+                <i class="bi bi-capsule-pill me-2"></i>{{ treatment.medication || 'No medication prescribed' }}
+              </p>
+            </div>
+
+            <div class="col-12 mt-4">
+              <div class="p-4 bg-yellow-light rounded-4 border-start border-4 border-warning">
+                <label class="small text-warning-emphasis text-uppercase fw-bold mb-2 d-block">
+                  <i class="bi bi-journal-text me-2"></i>Physician's Clinical Notes
+                </label>
+                <p class="mb-0 lh-lg text-dark">
+                  {{ treatment.notes || 'No additional clinical notes provided for this session.' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer bg-light p-4 border-0 text-center">
+          <button class="btn btn-outline-secondary rounded-pill px-4" onclick="window.print()">
+            <i class="bi bi-printer me-2"></i>Print Record
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* You can add custom styling here if needed */
-.container {
-  max-width: 700px;
+.bg-yellow-light {
+  background-color: #fffdf0;
 }
-
+label {
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 5px;
+}
 .card {
-  border-radius: 10px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

@@ -6,6 +6,7 @@ import DashboardPage from '@/components/DashboardPage.vue'
 import ProfilePage from '@/components/ProfilePage.vue'
 import TreatmentHistory from '@/components/TreatmentHistory.vue'
 import TreatmentDetail from '@/components/TreatmentDetail.vue'
+import BookingsPage from '@/components/BookingsPage.vue'
 
 
 
@@ -36,11 +37,14 @@ const routes = [
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
   {
+    path: '/bookings',
+    component: BookingsPage,
+    meta: { requiresAuth: true, showNav: true, showProfile: true }
+  },
+  {
     path: '/profile',
     component: ProfilePage,
-    meta: {
-      requiresAuth: true, showNav: true, showProfile: false
-    }
+    meta: { requiresAuth: true, showNav: true, showProfile: false }
   },
   { path: '/history',
     component: TreatmentHistory,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/api' // WICHTIG: Nutzt deine api.ts Konfiguration
+import api from '@/api' // uses api.ts
 
 // Interfaces für Typsicherheit
 interface UserInfo {

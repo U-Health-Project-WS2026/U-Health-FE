@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '@/api'
 
 interface Treatment {
   id: number
@@ -12,147 +12,110 @@ interface Treatment {
 }
 
 const router = useRouter()
-
-// treatment list aus API
 const treatments = ref<Treatment[]>([])
-
-// sort state
-const sortKey = ref('')
-
-const sortAsc = ref(true)
-
-// search filter
+const loading = ref(true)
 const searchQuery = ref('')
+const sortKey = ref('date')
+const sortAsc = ref(false) // Standardmäßig neueste zuerst
 
-// load data from backend
 async function loadTreatmentHistory() {
+  loading.value = true
   try {
-    const response = await axios.get('/api/treatment-history')
-    treatments.value = response.data
+    // Nutzt deinen api-Interceptor für automatischen Token & baseURL
+    const response = await api.get('/v1/patients/treatments')
+    treatments.value = response.data.data || response.data
   } catch (error) {
-    console.error('Failed to load treatment history:', error)
+    console.error('Failed to load history:', error)
+  } finally {
+    loading.value = false
   }
 }
 
 onMounted(loadTreatmentHistory)
 
-// sorted & filtered result
 const filteredAndSorted = computed(() => {
   let items = [...treatments.value]
-
-  // filter
   if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
     items = items.filter((t) =>
-      Object.values(t).some((val) =>
-        String(val).toLowerCase().includes(searchQuery.value.toLowerCase()),
-      ),
+      Object.values(t).some((val) => String(val).toLowerCase().includes(query))
     )
   }
-
-  // sort
-  if (sortKey.value) {
-    items.sort((a, b) => {
-      const aVal = String(a[sortKey.value as keyof Treatment] ?? '')
-      const bVal = String(b[sortKey.value as keyof Treatment] ?? '')
-      if (aVal < bVal) return sortAsc.value ? -1 : 1
-      if (aVal > bVal) return sortAsc.value ? 1 : -1
-      return 0
-    })
-  }
-
+  items.sort((a, b) => {
+    const aVal = String(a[sortKey.value as keyof Treatment] ?? '')
+    const bVal = String(b[sortKey.value as keyof Treatment] ?? '')
+    return sortAsc.value ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+  })
   return items
 })
 
-// handle sort click
 function sortBy(key: keyof Treatment) {
-  if (sortKey.value === key) {
-    sortAsc.value = !sortAsc.value
-  } else {
-    sortKey.value = key
-    sortAsc.value = true
-  }
+  if (sortKey.value === key) { sortAsc.value = !sortAsc.value }
+  else { sortKey.value = key; sortAsc.value = true }
 }
 
-// show row details
-function viewDetails(item: Treatment) {
-  router.push({ name: 'TreatmentDetail', params: { id: item.id } })
+function viewDetails(id: number) {
+  router.push({ name: 'TreatmentDetail', params: { id } })
 }
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h2 class="text-center text-primary mb-4">Treatment History</h2>
-
-    <!-- Search / Filter -->
-    <div class="row mb-3">
-      <div class="col-md-4 mx-auto">
-        <input
-          v-model="searchQuery"
-          type="text"
-          class="form-control"
-          placeholder="Search treatments..."
-        />
+  <div class="min-vh-100 bg-light py-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold text-dark mb-1">Treatment History</h2>
+          <p class="text-muted">Overview of your past medical records</p>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group shadow-sm rounded-pill overflow-hidden">
+            <span class="input-group-text bg-white border-0"><i class="bi bi-search"></i></span>
+            <input v-model="searchQuery" type="text" class="form-control border-0 p-2" placeholder="Search records...">
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead class="table-light">
-          <tr>
-            <th @click="sortBy('date')" style="cursor: pointer">
-              Date
-              <span v-if="sortKey === 'date'">
-                <i v-if="sortAsc" class="bi bi-arrow-down"></i>
-                <i v-else class="bi bi-arrow-up"></i>
-              </span>
-            </th>
-            <th @click="sortBy('diagnosis')" style="cursor: pointer">
-              Diagnosis
-              <span v-if="sortKey === 'diagnosis'">
-                <i v-if="sortAsc" class="bi bi-arrow-down"></i>
-                <i v-else class="bi bi-arrow-up"></i>
-              </span>
-            </th>
-            <th @click="sortBy('treatment')" style="cursor: pointer">
-              Treatment
-              <span v-if="sortKey === 'treatment'">
-                <i v-if="sortAsc" class="bi bi-arrow-down"></i>
-                <i v-else class="bi bi-arrow-up"></i>
-              </span>
-            </th>
-            <th @click="sortBy('medication')" style="cursor: pointer">
-              Medication
-              <span v-if="sortKey === 'medication'">
-                <i v-if="sortAsc" class="bi bi-arrow-down"></i>
-                <i v-else class="bi bi-arrow-up"></i>
-              </span>
-            </th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="filteredAndSorted.length === 0">
-            <td colspan="5" class="text-center text-muted">No matching treatments found.</td>
-          </tr>
-          <tr v-for="item in filteredAndSorted" :key="item.id">
-            <td>{{ item.date }}</td>
-            <td>{{ item.diagnosis }}</td>
-            <td>{{ item.treatment }}</td>
-            <td>{{ item.medication }}</td>
-            <td>
-              <button class="btn btn-sm btn-outline-primary" @click="viewDetails(item)">
-                View Details
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-primary text-white">
+              <tr>
+                <th @click="sortBy('date')" class="p-3 cursor-pointer">Date <i class="bi" :class="sortKey === 'date' ? (sortAsc ? 'bi-sort-up' : 'bi-sort-down') : 'bi-hash'"></i></th>
+                <th @click="sortBy('diagnosis')" class="p-3 cursor-pointer">Diagnosis</th>
+                <th class="p-3">Treatment</th>
+                <th class="p-3">Medication</th>
+                <th class="p-3 text-end">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="5" class="text-center py-5"><div class="spinner-border text-primary"></div></td>
+              </tr>
+              <tr v-else-if="filteredAndSorted.length === 0">
+                <td colspan="5" class="text-center py-5 text-muted">No records found.</td>
+              </tr>
+              <tr v-for="item in filteredAndSorted" :key="item.id" class="border-bottom">
+                <td class="p-3 fw-bold">{{ new Date(item.date).toLocaleDateString() }}</td>
+                <td class="p-3"><span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3">{{ item.diagnosis }}</span></td>
+                <td class="p-3 text-secondary">{{ item.treatment }}</td>
+                <td class="p-3"><i class="bi bi-capsule me-2"></i>{{ item.medication || 'None' }}</td>
+                <td class="p-3 text-end">
+                  <button class="btn btn-sm btn-light rounded-pill px-3 shadow-sm border" @click="viewDetails(item.id)">
+                    View <i class="bi bi-chevron-right ms-1"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-th {
-  user-select: none;
-}
+.cursor-pointer { cursor: pointer; }
+.table thead th { font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+.table tbody tr { transition: background-color 0.2s; }
+.table tbody tr:hover { background-color: #f8faff; }
 </style>
