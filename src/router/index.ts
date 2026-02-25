@@ -3,6 +3,7 @@ import LoginPage from '@/components/LoginPage.vue'
 import RegisterUserPage from "@/components/RegisterUserPage.vue"
 import HomePage from '@/components/HomePage.vue'
 import DashboardPage from '@/components/DashboardPage.vue'
+import ProfilePage from '@/components/ProfilePage.vue'
 import TreatmentHistory from '@/components/TreatmentHistory.vue'
 import TreatmentDetail from '@/components/TreatmentDetail.vue'
 
@@ -33,6 +34,13 @@ const routes = [
   { path: '/dashboard',
     component: DashboardPage,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
+  },
+  {
+    path: '/profile',
+    component: ProfilePage,
+    meta: {
+      requiresAuth: true, showNav: true, showProfile: false
+    }
   },
   { path: '/history',
     component: TreatmentHistory,
