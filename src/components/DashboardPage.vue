@@ -29,7 +29,8 @@ const calendarOptions = ref({
 
 const fetchMyBookings = async () => {
   try {
-    const response = await api.get('/v1/patients/bookings')
+    const response = await api.get('/v1/patients/bookings/booked')
+    console.log("API Raw Data:", response.data.data) // Debugging, schauen was ankommt
     // Filtere nur Termine, die dem Patienten gehören (status 1 oder patient != null)
     // Hier passen wir das Mapping an deine API an
     const myEvents = response.data.data
@@ -43,6 +44,7 @@ const fetchMyBookings = async () => {
         borderColor: '#0d6efd'
       }))
     calendarOptions.value.events = myEvents
+
   } catch (err) {
     console.error("Error fetching bookings", err)
   } finally {
