@@ -55,9 +55,7 @@ const routes = [
     component: TreatmentDetail,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
-  //    { path: '/book-appointment', component: BookAppointment },
-  //    { path: '/cancel-appointment', component: CancelAppointment },
-  //    { path: '/profile', component: ProfilePage },
+  
 ]
 
 const router = createRouter({

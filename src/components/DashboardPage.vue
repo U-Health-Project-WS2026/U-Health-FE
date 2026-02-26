@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * @file DashboardPage.vue
+ * @description Central control panel for the patient.
+ * * This component provides a visual overview of the user's medical schedule.
+ * Key features:
+ * 1. Interactive Calendar: Integration of FullCalendar to display personal appointments.
+ * 2. Real-time Data Fetching: Retrieves booked slots from the backend and maps them to calendar events.
+ * 3. Appointment Management: Allows users to cancel existing bookings directly via the calendar interface.
+ * 4. Navigation Hub: Quick access to treatment history and the booking system for new appointments.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
@@ -6,36 +19,65 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
+/**
+ * @interface Booking
+ * @description Represents the data structure of an appointment returned by the API.
+ */
+interface Booking {
+  booking_id: number;
+  time_slot_start: string;
+  time_slot_end: string;
+  status: number;
+  patient: any | null;
+}
+
 const router = useRouter()
+
+/** @type {import('vue').Ref<boolean>} Loading state for the calendar and API request. */
 const loading = ref(true)
 
+/** * @type {import('vue').Ref<Object>} Configuration object for the FullCalendar component.
+ * Includes plugin registration, styling options, and event click handlers.
+ */
 const calendarOptions = ref({
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   headerToolbar: {
     left: 'prev,next today',
     center: 'title',
-    right: 'dayGridMonth'
+    right: ''
   },
   themeSystem: 'bootstrap5',
   height: 'auto',
-  events: [],
-  eventClick: (info) => {
+  events: [] as any[],
+
+  /**
+   * Handler for clicking an event on the calendar.
+   * Triggers a confirmation dialog to cancel the selected appointment.
+   * @param {Object} info - Information about the clicked event provided by FullCalendar.
+   */
+  eventClick: (info: any) => {
     if(confirm(`Cancel appointment on ${info.event.start?.toLocaleString()}?`)) {
       cancelAppointment(info.event.id)
     }
   }
 })
 
-const fetchMyBookings = async () => {
+/**
+ * Fetches all appointments assigned to the currently authenticated patient.
+ * Filters the raw API data and transforms it into FullCalendar-compatible event objects.
+ * * @async
+ * @function fetchMyBookings
+ * @returns {Promise<void>}
+ */
+const fetchMyBookings = async (): Promise<void> => {
   try {
     const response = await api.get('/v1/patients/bookings/booked')
-    console.log("API Raw Data:", response.data.data) // Debugging, schauen was ankommt
-    // Filtere nur Termine, die dem Patienten gehören (status 1 oder patient != null)
-    // Hier passen wir das Mapping an deine API an
+
+    // Transform API data into FullCalendar event format
     const myEvents = response.data.data
-      .filter((b: any) => b.status === 1 || b.patient !== null)
-      .map((b: any) => ({
+      .filter((b: Booking) => b.status === 1 || b.patient !== null)
+      .map((b: Booking) => ({
         id: b.booking_id,
         title: 'Your Appointment',
         start: b.time_slot_start,
@@ -43,8 +85,8 @@ const fetchMyBookings = async () => {
         backgroundColor: '#0d6efd',
         borderColor: '#0d6efd'
       }))
-    calendarOptions.value.events = myEvents
 
+    calendarOptions.value.events = myEvents
   } catch (err) {
     console.error("Error fetching bookings", err)
   } finally {
@@ -52,16 +94,28 @@ const fetchMyBookings = async () => {
   }
 }
 
-const cancelAppointment = async (id: string) => {
+/**
+ * Sends a cancellation request for a specific appointment to the backend.
+ * Upon success, it refreshes the local calendar data.
+ * * @async
+ * @function cancelAppointment
+ * @param {string} id - The unique ID (booking_id) of the appointment to be canceled.
+ * @returns {Promise<void>}
+ */
+const cancelAppointment = async (id: string): Promise<void> => {
   try {
     await api.put(`/v1/patients/bookings/cancel/${id}`)
     alert("Appointment canceled.")
-    fetchMyBookings()
-  } catch {
+    fetchMyBookings() // Re-fetch data to sync UI
+  } catch (err) {
     alert("Error canceling appointment.")
+    console.error(err)
   }
 }
 
+/**
+ * Lifecycle hook: Fetch initial booking data when the component is mounted.
+ */
 onMounted(fetchMyBookings)
 </script>
 
@@ -106,23 +160,34 @@ onMounted(fetchMyBookings)
 </template>
 
 <style>
-/* Kalender Styling Anpassungen */
+
+/* Global Calendar Overrides
+  Customizing the FullCalendar default Bootstrap 5 theme to match U-Health branding.
+*/
 .fc .fc-button-primary {
   background-color: #0d6efd;
   border: none;
   border-radius: 20px;
   padding: 8px 16px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.fc .fc-button-primary:hover {
+  background-color: #0b5ed7;
 }
 .fc .fc-toolbar-title {
   font-weight: 700;
   font-size: 1.25rem;
+  color: #212529;
 }
 .fc-theme-bootstrap5 a {
   text-decoration: none;
   color: #212529;
 }
 .fc-daygrid-event {
-  border-radius: 4px;
-  padding: 2px 4px;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 </style>

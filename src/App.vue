@@ -1,7 +1,23 @@
 <script setup lang="ts">
+/**
+ * @file App.vue
+ * @description The Root Component of the U-Health application.
+ * * This component acts as the main layout wrapper and is responsible for:
+ * 1. Global Layout Structure: Implementing a "Sticky Footer" using Flexbox (min-vh-100).
+ * 2. Conditional Navigation: Rendering the Navbar based on route metadata (`showNav`).
+ * 3. Authentication-Aware UI: Displaying specific links (Dashboard vs. Login) and the
+ * Profile button based on the user's authentication state and route meta tags.
+ * 4. Dynamic Content Rendering: Providing the main `<router-view />` for page transitions.
+ * 5. Global Footer: Displaying consistent branding, legal links, and security badges.
+ * * @requires vue-router - For route-based conditional rendering and navigation.
+ */
+
 import { useRoute } from 'vue-router'
 
+/** @type {Object} The current route object provided by Vue Router to access metadata. */
 const route = useRoute()
+
+/** @type {number} Dynamically calculated current year for the copyright notice in the footer. */
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -62,7 +78,10 @@ const currentYear = new Date().getFullYear()
 </template>
 
 <style scoped>
-/* Sticky Footer Logik */
+/* Sticky Footer Logic:
+  The #app container uses min-vh-100 to ensure it always spans at least the full viewport height.
+  The flex-grow-1 on <main> ensures it takes up all available space.
+*/
 #app {
   background-color: #f8f9fa; /* Einheitlicher Hintergrund für die gesamte App */
 }
