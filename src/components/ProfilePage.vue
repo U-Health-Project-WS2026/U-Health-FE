@@ -7,8 +7,8 @@
  * 1. Profile Retrieval: Fetching comprehensive patient and account data via the '/v1/patients/me' endpoint.
  * 2. Data Transformation: Converting raw backend codes (e.g., sex ID) into human-readable labels.
  * 3. Session Management: Providing a secure logout mechanism by clearing local storage.
- * 4. Security Controls: Interface for password updates with client-side matching logic.
- * 5. Error Handling: Graceful degradation and user feedback in case of session expiration or server errors.
+ * 4. Security Controls: Password update functionality with real-time feedback.
+ * 5. Error Handling: Intercepting session expiration (401) and validation errors.
  * * @author [Christopher Herlitz]
  * @version 1.1.0
  */
@@ -16,6 +16,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
+import axios from 'axios'
 
 
 /**
@@ -53,13 +54,16 @@ const loading = ref(true)
 /** @type {import('vue').Ref<string>} Error message storage for API or Auth failures. */
 const error = ref('')
 
+/** @type {import('vue').Ref<boolean>} UI state for the password update button. */
+const passwordLoading = ref(false)
+
 /** * @type {import('vue').Ref<Object>}
- * Temporary storage for password change form inputs.
+ * Reactive object for password change form inputs, matching the backend's expected schema.
  */
 const passwordData = ref({
-  old_password: '',
-  new_password: '',
-  confirm_password: ''
+  current_password: '',
+  password: '',
+  password_confirmation: ''
 })
 
 
@@ -113,23 +117,52 @@ const handleLogout = (): void => {
 
 /**
  * Handles the password change request.
- * Performs a pre-flight check to ensure new passwords match.
+ * 1. Validates that the new password and confirmation match.
+ * 2. Submits the current and new password to the security endpoint.
+ * 3. Clears the form on success.
  * * @async
  * @function changePassword
  * @returns {Promise<void>}
  */
 const changePassword = async (): Promise<void> => {
-  if (passwordData.value.new_password !== passwordData.value.confirm_password) {
+  // Client-side Validation
+  if (passwordData.value.password !== passwordData.value.password_confirmation) {
     alert('New passwords do not match!')
     return
   }
 
+  passwordLoading.value = true
+
   try {
-    // Beispiel-Aufruf für Passwortänderung (Endpoint muss im Backend hinzugefügt werden)
-    // await api.post('/v1/user/change-password', passwordData.value)
-    alert('Password change functionality would be called here.')
+    /** * API Call to the dedicated password change endpoint.
+     * Token injection is handled automatically by api.ts interceptors.
+     */
+    const response = await api.post('/v1/change-current-password', {
+      current_password: passwordData.value.current_password,
+      password: passwordData.value.password,
+      password_confirmation: passwordData.value.password_confirmation
+    })
+
+    alert(response.data.message || 'Password successfully updated!')
+
+    // Clear form fields after success
+    passwordData.value = {
+      current_password: '',
+      password: '',
+      password_confirmation: ''
+    }
   } catch (err: any) {
-    alert('Error changing password: ' + (err.response?.data?.message || 'Unknown error'))
+    /**
+     * Error Handling: Displays specific validation errors from the backend
+     * (e.g., "Current password incorrect").
+     */
+    if (axios.isAxiosError(err)) {
+      alert('Error: ' + (err.response?.data?.message || 'Password update failed.'))
+    } else {
+      alert('An unexpected error occurred.')
+    }
+  } finally {
+    passwordLoading.value = false
   }
 }
 
@@ -231,15 +264,15 @@ onMounted(fetchProfile)
               <form @submit.prevent="changePassword">
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Current Password</label>
-                  <input v-model="passwordData.old_password" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
+                  <input v-model="passwordData.current_password" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
                 </div>
                 <div class="mb-3">
                   <label class="form-label small fw-bold">New Password</label>
-                  <input v-model="passwordData.new_password" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
+                  <input v-model="passwordData.password" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
                 </div>
                 <div class="mb-4">
                   <label class="form-label small fw-bold">Confirm New Password</label>
-                  <input v-model="passwordData.confirm_password" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
+                  <input v-model="passwordData.password_confirmation" type="password" class="form-control bg-light border-0 p-3 rounded-3" placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn btn-primary w-100 p-3 rounded-3 fw-bold">
                   Update Password
