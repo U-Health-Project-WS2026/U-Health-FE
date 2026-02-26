@@ -1,9 +1,27 @@
 <script setup lang="ts">
+/**
+ * @file HomePage.vue
+ * @description The public landing page and main entry point of the U-Health application.
+ * * This component serves as the initial touchpoint for users and is responsible for:
+ * 1. Branding: Presenting the U-Health mission and value proposition.
+ * 2. Navigation: Providing clear Call-to-Action (CTA) buttons to the authentication flow.
+ * 3. Feature Overview: Highlighting the core services (Booking & History) through visual cards.
+ * 4. User Experience: Implementing smooth hover transitions and entrance animations to engage users.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-function goToLogin() {
+/**
+ * Triggers programmatic navigation to the login page.
+ * This is the primary CTA (Call to Action) for new and returning users.
+ * * @function goToLogin
+ * @returns {void}
+ */
+function goToLogin(): void {
   router.push('/login')
 }
 </script>
@@ -61,7 +79,10 @@ function goToLogin() {
 </template>
 
 <style scoped>
-/* Custom Styles for extra polish */
+/**
+ * UI Enhancements
+ * Focusing on Affordance.
+ */
 
 .icon-box {
   width: 70px;
@@ -72,6 +93,17 @@ function goToLogin() {
   border-radius: 1.25rem;
 }
 
+/** * Hero Card Animation
+ * subtle entrance to draw user's eye
+ */
+.hero-card {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+/**
+ * Card Interaction Logic
+ * Provides feedback that the cards are clickable navigation elements.
+ */
 .transition-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
@@ -88,5 +120,16 @@ function goToLogin() {
 
 .hover-scale:hover {
   transform: scale(1.05);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

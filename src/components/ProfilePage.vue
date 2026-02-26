@@ -1,15 +1,37 @@
 <script setup lang="ts">
+/**
+ * @file ProfilePage.vue
+ * @description Personal account and profile management for the patient.
+ * * This component serves as the central hub for user data and security settings.
+ * Main functionalities include:
+ * 1. Profile Retrieval: Fetching comprehensive patient and account data via the '/v1/patients/me' endpoint.
+ * 2. Data Transformation: Converting raw backend codes (e.g., sex ID) into human-readable labels.
+ * 3. Session Management: Providing a secure logout mechanism by clearing local storage.
+ * 4. Security Controls: Interface for password updates with client-side matching logic.
+ * 5. Error Handling: Graceful degradation and user feedback in case of session expiration or server errors.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/api' // uses api.ts
+import api from '@/api'
 
-// Interfaces für Typsicherheit
+
+/**
+ * @interface UserInfo
+ * @description Nested object containing core authentication and identity details.
+ */
 interface UserInfo {
   user_id: number;
   username: string;
   email: string;
 }
 
+/**
+ * @interface PatientData
+ * @description Complete patient record including personal demographics and linked user account info.
+ */
 interface PatientData {
   patient_id: number;
   first_name: string;
@@ -21,37 +43,53 @@ interface PatientData {
 }
 
 const router = useRouter()
+
+/** @type {import('vue').Ref<PatientData|null>} Reactive storage for the fetched patient profile. */
 const patient = ref<PatientData | null>(null)
+
+/** @type {import('vue').Ref<boolean>} UI state for the loading spinner. */
 const loading = ref(true)
+
+/** @type {import('vue').Ref<string>} Error message storage for API or Auth failures. */
 const error = ref('')
 
-// Passwort-Änderung State
+/** * @type {import('vue').Ref<Object>}
+ * Temporary storage for password change form inputs.
+ */
 const passwordData = ref({
   old_password: '',
   new_password: '',
   confirm_password: ''
 })
 
-// Geschlecht-Mapping (0=weiblich, 1=männlich, 2=divers)
-const getSexLabel = (sex: number) => {
+
+/**
+ * Utility function to map numerical sex codes to readable strings.
+ * * @param {number} sex - The code from the database (0, 1, or 2).
+ * @returns {string} The corresponding label: 'Male', 'Female', 'Diverse', or 'Unknown'.
+ */
+const getSexLabel = (sex: number): string => {
   const labels: Record<number, string> = { 1: 'Male', 0: 'Female', 2: 'Diverse' }
   return labels[sex] || 'Unknown'
 }
 
-const fetchProfile = async () => {
+/**
+ * Fetches the current user's profile from the backend.
+ * Uses the centralized 'api' instance which automatically injects the Bearer token.
+ * * @async
+ * @function fetchProfile
+ * @returns {Promise<void>}
+ */
+const fetchProfile = async (): Promise<void> => {
   loading.value = true
   error.value = ''
 
   try {
-    // Da wir 'api' nutzen, wird der Token-Header automatisch durch deinen Interceptor angehängt
-    // Pfad ist relativ zur baseURL in api.ts (http://localhost:8000/api)
     const response = await api.get('/v1/patients/me')
     patient.value = response.data.data
-    console.log("Profile loaded successfully:", patient.value)
   } catch (err: any) {
     console.error("Profile Fetch Error Details:", err.response || err)
 
-    // Falls der Interceptor nicht schon umgeleitet hat, hier Fehler anzeigen
     if (err.response?.status === 401) {
       error.value = "Your session has expired. Please log in again."
     } else {
@@ -62,19 +100,32 @@ const fetchProfile = async () => {
   }
 }
 
-const handleLogout = () => {
+/**
+ * Terminates the user session.
+ * Removes the authentication token from LocalStorage and redirects to the Login page.
+ * @function handleLogout
+ */
+const handleLogout = (): void => {
   localStorage.removeItem('token')
   router.push('/login')
 }
 
-const changePassword = async () => {
+
+/**
+ * Handles the password change request.
+ * Performs a pre-flight check to ensure new passwords match.
+ * * @async
+ * @function changePassword
+ * @returns {Promise<void>}
+ */
+const changePassword = async (): Promise<void> => {
   if (passwordData.value.new_password !== passwordData.value.confirm_password) {
     alert('New passwords do not match!')
     return
   }
 
   try {
-    // Beispiel-Aufruf für Passwortänderung (Endpoint muss im Backend existieren)
+    // Beispiel-Aufruf für Passwortänderung (Endpoint muss im Backend hinzugefügt werden)
     // await api.post('/v1/user/change-password', passwordData.value)
     alert('Password change functionality would be called here.')
   } catch (err: any) {
@@ -213,6 +264,7 @@ onMounted(fetchProfile)
 </template>
 
 <style scoped>
+/* Icon Branding */
 .icon-circle {
   width: 60px;
   height: 60px;
@@ -226,18 +278,20 @@ onMounted(fetchProfile)
   letter-spacing: 1px;
 }
 
+/* Enhanced Focus States */
 .form-control:focus {
   background-color: #fff !important;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
   border: 1px solid #0d6efd !important;
 }
 
+/* Card Interactivity */
 .card {
   transition: all 0.3s ease;
 }
 
-/* Hover-Effekt für Karten */
 .card:hover {
   transform: translateY(-5px);
 }
+
 </style>

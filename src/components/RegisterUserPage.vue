@@ -1,28 +1,76 @@
 <script setup lang="ts">
+/**
+ * @file RegisterUserPage.vue
+ * @description User Onboarding/Registration interface for the U-Health platform.
+ * * This component manages the creation of new patient accounts.
+ * Core responsibilities include:
+ * 1. Data Collection: Capturing personal details (Name, Age, Sex, Location) and account credentials.
+ * 2. Input Validation: Ensuring password matches password confirmation before API submission.
+ * 3. Asynchronous Submission: Sending structured data to the '/v1/register' endpoint.
+ * 4. User Guidance: Providing feedback for successful registration and error handling for failed attempts.
+ * 5. Automatic Redirection: Navigating the user to the login page after successful signup.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import api from "@/api"
 import axios from "axios"
 
+// --- Reactive Form State Variables ---
+/** @type {import('vue').Ref<string>} Unique username for the account. */
 const username = ref("")
+
+/** @type {import('vue').Ref<string>} Patient's legal first name. */
 const firstName = ref("")
+
+/** @type {import('vue').Ref<string>} Patient's legal last name. */
 const lastName = ref("")
+
+/** @type {import('vue').Ref<number|null>} Patient's age (numeric input). */
 const age = ref<number | null>(null)
+
+/** @type {import('vue').Ref<number|null>} Biological sex code (0=Female, 1=Male, 2=Diverse). */
 const sex = ref<number | null>(null)
+
+/** @type {import('vue').Ref<string>} Geographic location or country. */
 const location = ref("")
+
+/** @type {import('vue').Ref<string>} Primary contact email address. */
 const email = ref("")
+
+/** @type {import('vue').Ref<string>} Account password (min 6 characters). */
 const password = ref("")
+
+/** @type {import('vue').Ref<string>} Verification field for the password. */
 const passwordConfirmation = ref("")
+
+
+// --- UI & Feedback State ---
+/** @type {import('vue').Ref<string>} Stores backend or validation error messages. */
 const error = ref("")
+/** @type {import('vue').Ref<string>} Stores success messages upon account creation. */
 const success = ref("")
+/** @type {import('vue').Ref<boolean>} Indicates if the registration request is in progress. */
 const loading = ref(false)
 
 const router = useRouter()
 
-async function onRegister() {
+
+/**
+ * Handles the registration form submission.
+ * Performs a client-side password match check before initiating the API call.
+ * On success, it displays a message and redirects the user after a short delay.
+ * * @async
+ * @function onRegister
+ * @returns {Promise<void>}
+ */
+async function onRegister(): Promise<void> {
   error.value = ""
   success.value = ""
 
+  // Client-side Validation: Integrity check for passwords
   if (password.value !== passwordConfirmation.value) {
     error.value = "Passwords do not match."
     return
@@ -44,8 +92,15 @@ async function onRegister() {
     })
 
     success.value = "Registration successful! Redirecting to login..."
+
+    // UX: Give the user time to read the success message before redirecting
     setTimeout(() => router.push("/login"), 2000)
   } catch (err: unknown) {
+    /**
+     * Error Handling:
+     * Differentiates between Axios-specific errors (e.g., 422 Unprocessable Content)
+     * and unexpected system failures.
+     */
     if (axios.isAxiosError(err)) {
       error.value = err.response?.data?.message ?? "Registration failed."
     } else {
@@ -56,7 +111,12 @@ async function onRegister() {
   }
 }
 
-function goToLogin() {
+
+/**
+ * Programmatic navigation back to the login view.
+ * @function goToLogin
+ */
+function goToLogin(): void {
   router.push("/login")
 }
 </script>
@@ -158,6 +218,8 @@ function goToLogin() {
 </template>
 
 <style scoped>
+/** * Focus states and Animations
+ */
 .form-control:focus, .form-select:focus {
   background-color: #fff !important;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1) !important;

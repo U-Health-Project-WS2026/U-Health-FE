@@ -1,3 +1,16 @@
+/**
+ * @file router/index.ts
+ * @description Central Routing Module for the U-Health Application.
+ * * This module defines the application's navigation structure and implements
+ * critical security features:
+ * 1. Route Definition: Mapping URLs to Vue components.
+ * 2. Meta-driven Layout: Controlling the visibility of Navbar and Profile elements.
+ * 3. Navigation Guards: Protecting private routes (Dashboard, Bookings, etc.)
+ * by verifying the presence of a session token.
+ * 4. Auth-State Redirects: Preventing logged-in users from accessing Login/Register pages.
+ * * @requires vue-router
+ */
+
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '@/components/LoginPage.vue'
 import RegisterUserPage from "@/components/RegisterUserPage.vue"
@@ -9,44 +22,59 @@ import TreatmentDetail from '@/components/TreatmentDetail.vue'
 import BookingsPage from '@/components/BookingsPage.vue'
 
 
-
-// Token Ablauf Prüfung für Sanctum (Opaque Tokens)
-function isTokenValid() {
+/**
+ * Basic Token Presence Check.
+ * Since the application uses Sanctum Opaque Tokens, full validity is verified
+ * server-side via API interceptors. This function performs a client-side
+ * pre-check to decide whether a user can stay on a protected route.
+ * * @function isTokenValid
+ * @returns {boolean} True if a token string exists in LocalStorage.
+ */
+function isTokenValid(): boolean {
   const token = localStorage.getItem("token")
-  // Da es kein JWT ist, können wir nur prüfen, ob er da ist.
-  // Die Gültigkeit prüft der Server bei jedem Request.
   return !!token;
 }
 
-
-const routes = [
+/**
+ * Route Configuration Array.
+ * Each route contains 'meta' properties used by App.vue to toggle UI elements.
+ * @type {Array<RouteRecordRaw>}
+ */
+const routes: Array<RouteRecordRaw> = [
   { path: '/',
+    name: 'Home',
     component: HomePage,
     meta: { showNav: true, showProfile: false }
   },
   { path: '/login',
+    name: 'Login',
      component: LoginPage,
     meta: { showNav: false }
   },
   { path: "/register",
+    name: 'Register',
     component: RegisterUserPage,
     meta: { showNav: false }
   },
   { path: '/dashboard',
+    name: 'Dashboard',
     component: DashboardPage,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
   {
     path: '/bookings',
+    name: 'Bookings',
     component: BookingsPage,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
   {
     path: '/profile',
+    name: 'Profile',
     component: ProfilePage,
     meta: { requiresAuth: true, showNav: true, showProfile: false }
   },
   { path: '/history',
+    name: 'History',
     component: TreatmentHistory,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
@@ -55,30 +83,49 @@ const routes = [
     component: TreatmentDetail,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
-  
 ]
 
+/**
+ * Router Instance Initialization.
+ * Uses Web History mode for clean URLs without hashes.
+ */
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
-
+/**
+ * Global Before Guard.
+ * Executed before every route transition to enforce security policies.
+ * * @param {RouteLocationNormalized} to - The target route object.
+ * @param {RouteLocationNormalized} from - The route being navigated from.
+ * @param {NavigationGuardNext} next - Function to resolve the hook and move to the next state.
+ */
 router.beforeEach((to, from, next) => {
   const tokenValid = isTokenValid()
 
-  // Falls die Route Auth benötigt und der Token ungültig/abgelaufen ist
+  /**
+   * Scenario: Unauthorized access to protected route.
+   * If the route requires authentication and no token is present,
+   * clear any residual local data and redirect to Login.
+   */
   if (to.meta.requiresAuth && !tokenValid) {
-    // Kein gültiger Token → zur Login-Seite
     localStorage.removeItem("token")
     return next("/login")
   }
 
-  // Wenn eingeloggt und versucht /login oder /register aufzurufen
+  /**
+   * Scenario: Logged-in user tries to access Auth pages.
+   * If a valid token exists, prevent access to Login/Register
+   * and redirect to the Dashboard instead.
+   */
   else if ((to.path === '/login' || to.path === '/register') && tokenValid) {
     next("/dashboard")
   }
 
+  /**
+   * Scenario: Default navigation for public routes or authorized states.
+   */
   else {
     next()
   }

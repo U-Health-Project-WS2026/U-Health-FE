@@ -1,8 +1,30 @@
 <script setup lang="ts">
+/**
+ * @file TreatmentHistory.vue
+ * @description Patient's medical record archive.
+ * * This component provides an organized, searchable, and sortable overview of the patient's
+ * medical history. Core features include:
+ * 1. Historical Data Retrieval: Fetches treatment records from the backend.
+ * 2. Dynamic Filtering: Real-time search functionality across all record fields.
+ * 3. Multi-key Sorting: Allows users to sort records by date or diagnosis (ascending/descending).
+ * 4. Detailed Navigation: Direct access to individual treatment summaries via route parameters.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
 
+/**
+ * @interface Treatment
+ * @description Defines the schema for a medical treatment record.
+ * @property {number} id - Unique identifier for the treatment session.
+ * @property {string} date - ISO date string of the consultation.
+ * @property {string} diagnosis - The medical finding or condition identified.
+ * @property {string} treatment - Description of the medical procedure or advice.
+ * @property {string} medication - List of prescribed drugs or therapeutic agents.
+ */
 interface Treatment {
   id: number
   date: string
@@ -12,16 +34,32 @@ interface Treatment {
 }
 
 const router = useRouter()
-const treatments = ref<Treatment[]>([])
-const loading = ref(true)
-const searchQuery = ref('')
-const sortKey = ref('date')
-const sortAsc = ref(false) // Standardmäßig neueste zuerst
 
-async function loadTreatmentHistory() {
+/** @type {import('vue').Ref<Treatment[]>} Local state for all fetched treatment records. */
+const treatments = ref<Treatment[]>([])
+
+/** @type {import('vue').Ref<boolean>} State to manage the loading overlay for the table. */
+const loading = ref(true)
+
+/** @type {import('vue').Ref<string>} Reactive search string bound to the search input. */
+const searchQuery = ref('')
+
+/** @type {import('vue').Ref<string>} The active property name used for sorting the table. */
+const sortKey = ref('date')
+
+/** @type {import('vue').Ref<boolean>} Toggle state for sorting order (true = ASC, false = DESC). */
+const sortAsc = ref(false)
+
+
+/**
+ * Loads the complete medical history for the authenticated patient.
+ * * @async
+ * @function loadTreatmentHistory
+ * @returns {Promise<void>}
+ */
+async function loadTreatmentHistory(): Promise<void> {
   loading.value = true
   try {
-    // Nutzt deinen api-Interceptor für automatischen Token & baseURL
     const response = await api.get('/v1/patients/treatments')
     treatments.value = response.data.data || response.data
   } catch (error) {
@@ -33,14 +71,26 @@ async function loadTreatmentHistory() {
 
 onMounted(loadTreatmentHistory)
 
-const filteredAndSorted = computed(() => {
+
+/**
+ * Computed property that handles the complex logic of filtering and sorting.
+ * * Logic:
+ * 1. Filter: Checks if any value in the treatment object contains the search query.
+ * 2. Sort: Applies alphabetical or chronological sorting based on current sortKey.
+ * * @type {import('vue').ComputedRef<Treatment[]>}
+ */
+const filteredAndSorted = computed((): Treatment[] => {
   let items = [...treatments.value]
+
+  // Filter logic: Case-insensitive search across all object properties
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     items = items.filter((t) =>
       Object.values(t).some((val) => String(val).toLowerCase().includes(query))
     )
   }
+
+  // Sorting logic
   items.sort((a, b) => {
     const aVal = String(a[sortKey.value as keyof Treatment] ?? '')
     const bVal = String(b[sortKey.value as keyof Treatment] ?? '')
@@ -49,12 +99,24 @@ const filteredAndSorted = computed(() => {
   return items
 })
 
-function sortBy(key: keyof Treatment) {
+
+/**
+ * Updates the sort key or toggles the sort direction.
+ * @function sortBy
+ * @param {keyof Treatment} key - The object key to sort by.
+ */
+function sortBy(key: keyof Treatment): void {
   if (sortKey.value === key) { sortAsc.value = !sortAsc.value }
   else { sortKey.value = key; sortAsc.value = true }
 }
 
-function viewDetails(id: number) {
+
+/**
+ * Navigates to the detailed view of a specific treatment.
+ * @function viewDetails
+ * @param {number} id - The ID of the treatment to view.
+ */
+function viewDetails(id: number): void {
   router.push({ name: 'TreatmentDetail', params: { id } })
 }
 </script>
@@ -114,8 +176,31 @@ function viewDetails(id: number) {
 </template>
 
 <style scoped>
+/**
+ * UI & Accessibility Styling
+ */
 .cursor-pointer { cursor: pointer; }
-.table thead th { font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
-.table tbody tr { transition: background-color 0.2s; }
-.table tbody tr:hover { background-color: #f8faff; }
+
+/* Table Header Polishing */
+.table thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* Row Hover Transitions */
+.table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background-color: #f8faff;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 </style>

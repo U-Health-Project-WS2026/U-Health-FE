@@ -1,16 +1,48 @@
 <script setup lang="ts">
+/**
+ * @file LoginPage.vue
+ * @description Authentication gateway for the U-Health application.
+ * * This component provides a secure interface for users to access their accounts.
+ * Core functionalities include:
+ * 1. User Authentication: Submits credentials to the Laravel Sanctum backend.
+ * 2. Session Management: Securely stores the retrieved Opaque Token in LocalStorage.
+ * 3. Error Handling: Intercepts and displays specific API error messages (e.g., invalid credentials).
+ * 4. UX States: Manages loading indicators and prevents multiple simultaneous login attempts.
+ * 5. Navigation: Provides entry points for registration and a mockup for password recovery.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import api from "@/api"
 import axios from "axios"
 
+/** @type {import('vue').Ref<string>} User's email input for authentication. */
 const email = ref("")
+
+/** @type {import('vue').Ref<string>} User's password input. */
 const password = ref("")
+
+/** @type {import('vue').Ref<string>} Stores error messages to be displayed in the UI. */
 const error = ref("")
+
+/** @type {import('vue').Ref<boolean>} Toggles the loading state (spinner/button disabling). */
 const loading = ref(false)
+
 const router = useRouter()
 
-async function onLogin() {
+
+/**
+ * Handles the login form submission.
+ * * Sends a POST request to the login endpoint. Upon success, it extracts the
+ * authentication token, persists it locally, and redirects to the dashboard.
+ * * @async
+ * @function onLogin
+ * @returns {Promise<void>}
+ * @throws {AxiosError} Specifically catches 422 (Validation) or 401 (Unauthorized) errors.
+ */
+async function onLogin(): Promise<void> {
   error.value = ""
   loading.value = true
 
@@ -20,13 +52,20 @@ async function onLogin() {
       password: password.value,
     })
 
-    // WICHTIG: Sicherstellen, dass nur der String gespeichert wird
+    /** * Persistence: Save the token string.
+     * The api.ts interceptor will automatically use this for future requests.
+     */
     const token = response.data.token
     localStorage.setItem("token", token)
 
-    // Weiterleitung zum Dashboard
+    // Smooth transition to the protected area
     await router.push("/dashboard")
   } catch (err: unknown) {
+    /**
+     * Centralized Error Interpretation:
+     * Checks if the error is an Axios instance to provide the user with
+     * a meaningful message from the backend.
+     */
     if (axios.isAxiosError(err)) {
       error.value = err.response?.data?.message ?? "Login failed. Please check your credentials."
     } else {
@@ -37,7 +76,12 @@ async function onLogin() {
   }
 }
 
-function handleForgotPassword() {
+/**
+ * Mockup function for the "Forgot Password" workflow.
+ * Validates that an email is present before suggesting a reset link.
+ * * @function handleForgotPassword
+ */
+function handleForgotPassword(): void {
   if (!email.value) {
     alert("Please enter your email address first.")
     return
@@ -46,7 +90,11 @@ function handleForgotPassword() {
   alert(`A reset link has been sent to: ${email.value} (Mockup function)`)
 }
 
-function goToRegister() {
+/**
+ * Programmatic navigation to the registration view.
+ * @function goToRegister
+ */
+function goToRegister(): void {
   router.push("/register")
 }
 </script>
@@ -126,7 +174,11 @@ function goToRegister() {
   </div>
 </template>
 
+
 <style scoped>
+/**
+ * UI Polishing & Interaction Feedback
+ */
 .form-control:focus {
   background-color: #fff !important;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1) !important;
@@ -144,5 +196,16 @@ function goToRegister() {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/** Visual cue for error state */
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 </style>

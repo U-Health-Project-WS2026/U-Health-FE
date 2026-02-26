@@ -1,30 +1,62 @@
 <script setup lang="ts">
+/**
+ * @file TreatmentDetail.vue
+ * @description In-depth view of a specific medical treatment record.
+ * * This component retrieves and displays granular details of a past medical session.
+ * Core features:
+ * 1. Dynamic Routing: Uses the URL ':id' parameter to fetch the correct record.
+ * 2. Data Presentation: Displays diagnoses, procedures, medications, and clinical notes.
+ * 3. Error Handling: Provides feedback if a record is not found or inaccessible.
+ * 4. Document Utility: Offers a "Print Record" function for physical filing or sharing.
+ * * @author [Christopher Herlitz]
+ * @version 1.1.0
+ */
+
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 
 const route = useRoute()
 const router = useRouter()
+
+/** @type {import('vue').Ref<boolean>} Loading state for the specific record fetch. */
 const loading = ref(true)
+
+/** @type {import('vue').Ref<string>} Error message for invalid IDs or connectivity issues. */
 const error = ref('')
 
+/** @type {import('vue').Ref<any>} Holds the detailed treatment object from the backend. */
 const treatment = ref<any>(null)
 
-async function loadTreatmentDetail() {
+
+/**
+ * Fetches the specific treatment details based on the ID provided in the route.
+ * * @async
+ * @function loadTreatmentDetail
+ * @returns {Promise<void>}
+ */
+async function loadTreatmentDetail(): Promise<void> {
   loading.value = true
   try {
     const id = route.params.id
-    // Konsistente URL mit api.ts baseURL
+    // GET request to the treatment resource
     const response = await api.get(`/v1/treatments/${id}`)
     treatment.value = response.data.data || response.data
-  } catch {
+  } catch (err) {
     error.value = 'Could not load treatment details. The record might not exist.'
+    console.error("Detail Fetch Error:", err)
   } finally {
     loading.value = false
   }
 }
 
-const formatDate = (dateString: string) => {
+/**
+ * Formats an ISO date string into a localized, user-friendly long format.
+ * @function formatDate
+ * @param {string} dateString - The raw date from the API.
+ * @returns {string} Formatted date (e.g., "Monday, October 12, 2023").
+ */
+const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   })
@@ -100,19 +132,42 @@ onMounted(loadTreatmentDetail)
 </template>
 
 <style scoped>
+/**
+ * Visual Polish for Medical Documents
+ */
+
 .bg-yellow-light {
-  background-color: #fffdf0;
+  background-color: #fffdf0; /* Soft background for notes */
 }
+
 label {
   letter-spacing: 0.5px;
   display: block;
   margin-bottom: 5px;
 }
+
+/** * Animation for data entrance
+ * Gives the application a fluid, modern feel
+ */
 .card {
   animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/**
+ * Print Optimization
+ */
+@media print {
+  .btn, .btn-link {
+    display: none !important; /* Hide navigation and print buttons when printing */
+  }
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
 }
 </style>
