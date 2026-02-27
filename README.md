@@ -113,10 +113,18 @@ To run the application locally, follow these steps to initialize both the databa
 
 
 
-### 4. Treatment History & Reports
-* **Archive:** View all past visits in the **"History"** tab. You can sort by date or diagnosis and use the search bar to find specific medications or symptoms.
-* **Clinical Detail:** Open the detail view to read physician's notes and specific treatment plans.
-* **Printing:** Use the **"Print Record"** button at the bottom of any treatment detail page to generate a physical copy for your records.
+### 4. Treatment History
+* **Archive:** View all past visits in the **"History"** tab.
+* **Hybrid Filtering:**
+    * **Search by Treatment:** Use the text bar to filter by treatment type.
+    * **Search by Date:** Use the date picker to perform a server-side query for specific consultation dates.
+
+* **Details:** Each row displays medical data:
+    * **Diseases:** All diagnosed conditions are shown as badges.
+    * **Medications:** Lists all prescribed drugs.
+
+* **Sorting:** Click table headers Date or Treatment Type to sort records chronologically or alphabetically.
+
 
 ---
 
@@ -124,6 +132,6 @@ To run the application locally, follow these steps to initialize both the databa
 ```text
 src/
 ├── api/            # api.ts (Axios configuration & Interceptors)
-├── components/     # Vue components (Auth, Dashboard, History, etc.)
+├── components/     # Vue components (Login, Dashboard, Treatment History, etc.)
 ├── router/         # index.ts (Route definitions & Navigation Guards & Dynamic Reset Routes)
 └── App.vue         # Root component with dynamic Navigation Bar logic

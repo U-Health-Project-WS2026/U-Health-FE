@@ -19,7 +19,6 @@ import {
   type NavigationGuardNext
 } from 'vue-router'
 
-//import { createRouter, createWebHistory } from 'vue-router'
 
 import LoginPage from '@/components/LoginPage.vue'
 import RegisterUserPage from "@/components/RegisterUserPage.vue"
@@ -28,7 +27,6 @@ import HomePage from '@/components/HomePage.vue'
 import DashboardPage from '@/components/DashboardPage.vue'
 import ProfilePage from '@/components/ProfilePage.vue'
 import TreatmentHistory from '@/components/TreatmentHistory.vue'
-import TreatmentDetail from '@/components/TreatmentDetail.vue'
 import BookingsPage from '@/components/BookingsPage.vue'
 
 
@@ -59,7 +57,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/login',
     name: 'Login',
      component: LoginPage,
-    meta: { showNav: false }
+    meta: { showNav: true }
   },
   { path: "/register",
     name: 'Register',
@@ -92,11 +90,6 @@ const routes: RouteRecordRaw[] = [
   { path: '/history',
     name: 'History',
     component: TreatmentHistory,
-    meta: { requiresAuth: true, showNav: true, showProfile: true }
-  },
-  { path: '/history/:id',
-    name: 'TreatmentDetail',
-    component: TreatmentDetail,
     meta: { requiresAuth: true, showNav: true, showProfile: true }
   },
 ]

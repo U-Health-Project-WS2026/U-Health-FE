@@ -1,13 +1,15 @@
 <script setup lang="ts">
 /**
  * @file ResetPasswordPage.vue
- * @description Finalizes the password recovery flow.
- * * This component:
- * 1. URL Parsing: Extracts the unique reset token and email from the route.
- * 2. New Password Submission: Sends the updated credentials to '/v1/reset-password'.
- * 3. Validation: Ensures password matching before API call.
+ * @description Finalizes the password recovery flow for the U-Health platform.
+ * * This component acts as the landing page for users arriving from an email reset link.
+ * Core responsibilities include:
+ * 1. URL Parameter Extraction: Parses the 'token' from the path and 'email' from query strings.
+ * 2. Input Validation: Enforces client-side matching of the new password and its confirmation.
+ * 3. Secure Submission: Communicates with the '/v1/reset-password' endpoint using the provided token.
+ * 4. UX Management: Displays success states and handles automatic redirection to the login gateway.
  * * @author [Christopher Herlitz]
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import { ref, onMounted } from 'vue'
@@ -28,7 +30,7 @@ const error = ref('')
 const success = ref(false)
 
 /** * @type {import('vue').Ref<Object>}
- * Reactive storage for the reset request payload.
+ * Reactive data model for the password reset request, matching the Laravel backend requirements.
  */
 const form = ref({
   token: '',
@@ -37,10 +39,15 @@ const form = ref({
   password_confirmation: ''
 })
 
+
+/**
+ * Lifecycle hook: Initializes the form data by reading the route state.
+ * Validates the presence of required parameters (token and email) immediately.
+ */
 onMounted(() => {
-  // Extract token from path: /password-reset/:token
+  // Path parameter extraction: defined as /password-reset/:token in the router
   form.value.token = route.params.token as string
-  // Extract email from query: ?email=...
+  // Query parameter extraction: expected as ?email=... in the URL
   form.value.email = route.query.email as string
 
   if (!form.value.token || !form.value.email) {
@@ -48,11 +55,16 @@ onMounted(() => {
   }
 })
 
+
 /**
- * Handles the password reset submission.
- * @async
+ * Handles the submission of the new password.
+ * Performs client-side matching before initiating the API request.
+ * * @async
+ * @function handleReset
+ * @returns {Promise<void>}
  */
 async function handleReset(): Promise<void> {
+  // Client-side pre-flight check
   if (form.value.password !== form.value.password_confirmation) {
     error.value = "Passwords do not match."
     return
@@ -62,11 +74,19 @@ async function handleReset(): Promise<void> {
   loading.value = true
 
   try {
+    /** * API Call to the password reset endpoint.
+     * Expected Response: { "status": "Your password has been reset." }
+     */
     await api.post("/v1/reset-password", form.value)
     success.value = true
+
     // Redirect to login after 3 seconds
     setTimeout(() => router.push('/login'), 3000)
   } catch (err: any) {
+    /**
+     * Error Handling:
+     * Catches 422 for expired tokens or 500 for server issues.
+     */
     if (axios.isAxiosError(err) && err.response?.status === 422) {
       error.value = err.response.data.message || "Failed to reset password. The link may have expired."
     } else {
@@ -136,8 +156,19 @@ async function handleReset(): Promise<void> {
   justify-content: center;
   border-radius: 50%; }
 
-.form-control:focus { background-color: #fff !important;
-border: 1px solid #ffc107 !important;
-box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.1) !important; }
+  /* Enhanced Focus States for better UX */
+.form-control:focus {
+  background-color: #fff !important;
+  border: 1px solid #ffc107 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.1) !important;
+}
+
+.input-group-text {
+  color: #6c757d;
+}
+
+.bg-success-subtle {
+  background-color: #d1e7dd;
+}
 
 </style>
