@@ -20,16 +20,17 @@ The application follows a modern decoupled architecture where the Frontend acts 
 * **Framework:** Vue 3 (Composition API) with Vite for optimized building.
 * **Language:** TypeScript for strict typing and interface definitions.
 * **Styling:** Bootstrap 5 for responsive UI components and customized CSS for medical branding.
-* **State & Logic:** * **Vue Router:** Manages navigation and route-based access control.
-    * **Axios:** Centralized HTTP client for asynchronous API requests.
-    * **FullCalendar:** Integrated library for managing patient schedules.
+* **State & Logic:** * **Vue Router:** Manages navigation, dynamic route matching for password resets and route-based access control.
+    * **Axios:** Centralized HTTP client with interceptors for Bearer Token injection.
+    * **FullCalendar:** Integrated library for interactive patient scheduling.
 
 ### Security Implementation
 Security is a core pillar of the U-Health interface:
 1.  **Token-Based Authentication:** Uses Laravel Sanctum Opaque Tokens. Tokens are stored in `LocalStorage` and managed via an Axios Request Interceptor.
-2.  **Navigation Guards:** Protected routes (Dashboard, Profile, History) are guarded. Unauthorized access attempts automatically redirect to the login page.
-3.  **Data Sanitization:** Strict TypeScript interfaces ensure that only validated data structures are rendered in the UI.
-4.  **Session Persistence:** Automatic cleanup of local session data upon logout or 401 (Unauthorized) server responses.
+2.  **Password Recovery Flow:** Implements a secure double-gate reset system (Email trigger -> Secure Tokenized Link -> Password Update).
+3.  **Navigation Guards:** Protected routes (Dashboard, Profile, History) are guarded. Unauthorized access attempts automatically redirect to the login page.
+4.  **Data Sanitization:** Strict TypeScript interfaces ensure that only validated data structures are rendered in the UI.
+5.  **Session Persistence:** Automatic cleanup of local session data upon logout or 401 (Unauthorized) server responses.
 
 ---
 
@@ -40,7 +41,7 @@ To run the application locally, follow these steps to initialize both the databa
 ### 1. Prerequisites
 * **PHP** (v8.2+) & **Composer**
 * **Node.js** (v18+) & **npm**
-* **MySQL**
+* **MySQL** & **Mailtrap**
 
 ### 2. Backend Initialization (Laravel)
 1.  Navigate to the backend directory.
@@ -56,6 +57,17 @@ To run the application locally, follow these steps to initialize both the databa
     DB_DATABASE=u_health_db
     DB_USERNAME=root
     DB_PASSWORD=
+
+    # Add your Mailtrap Sandbox credentials here
+    # e. g.:
+    MAIL_MAILER=smtp
+    MAIL_SCHEME=null
+    MAIL_HOST=sandbox.smtp.mailtrap.io
+    MAIL_PORT=2525
+    MAIL_USERNAME=31aa19ac3b8042
+    MAIL_PASSWORD=6d0962e0d74012
+    MAIL_FROM_ADDRESS="u-health-team@example.com"
+    MAIL_FROM_NAME="LARAVEL"
     ```
 4.  Run migrations and seed the database:
     ```sh
@@ -81,9 +93,13 @@ To run the application locally, follow these steps to initialize both the databa
 
 
 
-### 1. Account Access
+### 1. Account Access & Security
 * **Registration:** New users must sign up via the `/register` page. All fields (including demographic data) are required for medical record accuracy.
 * **Authentication:** Log in to receive your session token. If you are already logged in, the system will automatically redirect you from the login page to your Dashboard.
+* **Forgot Password:** 1. Click "Forgot password?" on the Login page.
+    2. Enter your registered email. 
+    3. Receive a secure reset link via email (viewable in Mailtrap).
+    4. Click the link to be redirected to the **Reset Password Page** where you can safely set a new credential.
 
 ### 2. Dashboard & Calendar
 * The Dashboard provides an immediate overview of your medical schedule.
@@ -109,5 +125,5 @@ To run the application locally, follow these steps to initialize both the databa
 src/
 ├── api/            # api.ts (Axios configuration & Interceptors)
 ├── components/     # Vue components (Auth, Dashboard, History, etc.)
-├── router/         # index.ts (Route definitions & Navigation Guards)
+├── router/         # index.ts (Route definitions & Navigation Guards & Dynamic Reset Routes)
 └── App.vue         # Root component with dynamic Navigation Bar logic

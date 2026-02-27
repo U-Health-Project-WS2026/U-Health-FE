@@ -11,9 +11,19 @@
  * * @requires vue-router
  */
 
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+  type RouteLocationNormalized,
+  type NavigationGuardNext
+} from 'vue-router'
+
+//import { createRouter, createWebHistory } from 'vue-router'
+
 import LoginPage from '@/components/LoginPage.vue'
 import RegisterUserPage from "@/components/RegisterUserPage.vue"
+import ResetPasswordPage from '@/components/ResetPasswordPage.vue'
 import HomePage from '@/components/HomePage.vue'
 import DashboardPage from '@/components/DashboardPage.vue'
 import ProfilePage from '@/components/ProfilePage.vue'
@@ -38,9 +48,9 @@ function isTokenValid(): boolean {
 /**
  * Route Configuration Array.
  * Each route contains 'meta' properties used by App.vue to toggle UI elements.
- * @type {Array<RouteRecordRaw>}
+ * @type {RouteRecordRaw[]}
  */
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
   { path: '/',
     name: 'Home',
     component: HomePage,
@@ -55,6 +65,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Register',
     component: RegisterUserPage,
     meta: { showNav: false }
+  },
+  {
+    path: '/password-reset/:token',
+    name: 'ResetPassword',
+    component: ResetPasswordPage,
+    meta: { showNav: false, requiresAuth: false }
   },
   { path: '/dashboard',
     name: 'Dashboard',
@@ -101,7 +117,7 @@ const router = createRouter({
  * @param {RouteLocationNormalized} from - The route being navigated from.
  * @param {NavigationGuardNext} next - Function to resolve the hook and move to the next state.
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const tokenValid = isTokenValid()
 
   /**

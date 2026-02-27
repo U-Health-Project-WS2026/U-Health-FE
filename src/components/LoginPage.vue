@@ -27,6 +27,9 @@ const password = ref("")
 /** @type {import('vue').Ref<string>} Stores error messages to be displayed in the UI. */
 const error = ref("")
 
+/** @type {import('vue').Ref<string>} Stores success messages, specifically for password reset confirmation. */
+const successMessage = ref("")
+
 /** @type {import('vue').Ref<boolean>} Toggles the loading state (spinner/button disabling). */
 const loading = ref(false)
 
@@ -44,6 +47,7 @@ const router = useRouter()
  */
 async function onLogin(): Promise<void> {
   error.value = ""
+  successMessage.value = ""
   loading.value = true
 
   try {
@@ -76,19 +80,36 @@ async function onLogin(): Promise<void> {
   }
 }
 
+
 /**
- * Mockup function for the "Forgot Password" workflow.
- * Validates that an email is present before suggesting a reset link.
- * * @function handleForgotPassword
+ * Triggers the password reset email flow.
+ * * Sends a POST request to '/v1/forgot-password'.
+ * @async
+ * @function handleForgotPassword
  */
-function handleForgotPassword(): void {
+async function handleForgotPassword(): Promise<void> {
   if (!email.value) {
-    alert("Please enter your email address first.")
+    error.value = "Please enter your email address first to reset your password."
     return
   }
-  // Hier käme dein API-Call für den Password-Reset hin
-  alert(`A reset link has been sent to: ${email.value} (Mockup function)`)
+
+  error.value = ""
+  loading.value = true
+
+  try {
+    const response = await api.post("/v1/forgot-password", { email: email.value })
+    successMessage.value = response.data.status // "We have emailed your password reset link."
+  } catch (err: any) {
+    if (axios.isAxiosError(err) && err.response?.status === 422) {
+      error.value = "We couldn't find a user with that email address."
+    } else {
+      error.value = "Error sending reset link. Please try again later."
+    }
+  } finally {
+    loading.value = false
+  }
 }
+
 
 /**
  * Programmatic navigation to the registration view.
@@ -98,6 +119,7 @@ function goToRegister(): void {
   router.push("/register")
 }
 </script>
+
 
 <template>
   <div class="min-vh-100 d-flex justify-content-center align-items-center bg-light px-3">
@@ -109,6 +131,10 @@ function goToRegister(): void {
       </div>
 
       <div class="card-body p-4 p-md-5">
+        <div v-if="successMessage" class="alert alert-success border-0 small mb-4">
+          <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        </div>
+
         <form @submit.prevent="onLogin">
           <div class="mb-3">
             <label for="email" class="form-label fw-bold small text-secondary">Email Address</label>
@@ -141,7 +167,7 @@ function goToRegister(): void {
           </div>
 
           <div class="text-end mb-4">
-            <button type="button" @click="handleForgotPassword" class="btn btn-link p-0 text-decoration-none small fw-semibold">
+            <button type="button" @click="handleForgotPassword" class="btn btn-link p-0 text-decoration-none small fw-semibold" :disabled="loading">
               Forgot password?
             </button>
           </div>
@@ -152,7 +178,7 @@ function goToRegister(): void {
             :disabled="loading"
           >
             <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ loading ? "Signing in..." : "Sign In" }}
+            {{ loading ? "Processing..." : "Sign In" }}
           </button>
 
           <div v-if="error" class="alert alert-danger d-flex align-items-center mt-3 border-0 small">
