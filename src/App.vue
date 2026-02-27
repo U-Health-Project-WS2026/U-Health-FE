@@ -54,7 +54,7 @@ const currentYear = new Date().getFullYear()
         <div class="row align-items-center">
           <div class="col-md-4 text-center text-md-start">
             <span class="fw-bold text-primary">U-Health</span>
-            <p class="text-muted small mb-0">&copy; {{ currentYear }} Digital Medical Solutions</p>
+            <p class="text-muted small mb-0">&copy; {{ currentYear }} Universität Tübingen</p>
           </div>
 
           <div class="col-md-4 text-center my-3 my-md-0">
@@ -65,12 +65,7 @@ const currentYear = new Date().getFullYear()
             </div>
           </div>
 
-          <div class="col-md-4 text-center text-md-end">
-            <div class="text-muted small">
-              <i class="bi bi-shield-check text-success me-1"></i>
-              SSL Encrypted Data
-            </div>
-          </div>
+
         </div>
       </div>
     </footer>

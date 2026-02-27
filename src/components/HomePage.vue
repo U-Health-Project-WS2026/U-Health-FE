@@ -43,7 +43,7 @@ function goToRegister(): void {
       <div class="row justify-content-center mb-5 hero-card">
         <div class="col-lg-9 text-center">
           <div class="p-5 shadow-lg rounded-4 bg-white border-0">
-            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">Healthcare Excellence</span>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3 fw-bold">Healthcare Universität Tübingen</span>
             <h1 class="display-3 fw-bold text-primary mb-3">U‑Health</h1>
             <p class="lead text-secondary fs-4 mb-4">
               Empowering your wellness through digital innovation. <br class="d-none d-md-block">
