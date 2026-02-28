@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file LoginPage.vue
+ * @module LoginPage
  * @description Authentication gateway for the U-Health application.
  * * This component provides a secure interface for users to access their accounts.
  * Core functionalities include:

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file RegisterUserPage.vue
+ * @module RegisterUserPage
  * @description User Registration interface for the U-Health platform.
  * * This component manages the creation of new patient accounts.
  * Core responsibilities include:

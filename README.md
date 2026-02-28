@@ -78,7 +78,7 @@ To run the application locally, follow these steps to initialize both the databa
     ```
 
 5.  Configure your `.env` file with your MySQL credentials:
-    ```env
+    ```
     APP_URL=http://localhost:8000
     FRONTEND_URL=http://localhost:5173
 

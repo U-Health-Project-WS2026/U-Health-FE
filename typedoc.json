@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/api.ts", 
+    "src/router/index.ts", 
+    "src/components/*.vue"
+  ],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "name": "U-Health Patient Interface",
+  "includeVersion": true,
+  "plugin": ["typedoc-plugin-vue"],
+  "tsconfig": "tsconfig.app.json",
+  "hideGenerator": true,
+  "cleanOutputDir": true,
+  "skipErrorChecking": true,
+  "commentStyle": "all",
+  "searchInComments": true,
+  "exclude": ["node_modules", "dist", "src/__tests__/**", "**/*.spec.ts"]
+}

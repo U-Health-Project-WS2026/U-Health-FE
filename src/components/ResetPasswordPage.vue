@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file ResetPasswordPage.vue
+ * @module ResetPasswordPage
  * @description Finalizes the password recovery flow for the U-Health platform.
  * * This component acts as the landing page for users arriving from an email reset link.
  * Core responsibilities include:

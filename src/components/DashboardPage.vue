@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file DashboardPage.vue
+ * @module DashboardPage
  * @description Central control panel for the patient.
  * * This component provides a visual overview of the user's medical schedule.
  * Key features:

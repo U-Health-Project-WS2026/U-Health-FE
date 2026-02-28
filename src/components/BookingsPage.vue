@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file BookingsPage.vue
+ * @module BookingsPage
  * @description Interface for discovering and booking new medical appointments.
  * * This component provides the following functionality:
  * 1. Data Retrieval: Fetches all available time slots from the backend.

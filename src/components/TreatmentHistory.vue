@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file TreatmentHistory.vue
+ * @module TreatmentHistory
  * @description Patient's medical record archive with advanced relational data mapping.
  * * This component provides an organized, searchable, and sortable overview of the patient's
  * medical history. Functionality includes:

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file ProfilePage.vue
+ * @module ProfilePage
  * @description Personal account and profile management for the patient.
  * * This component serves as the central hub for user data and security settings.
  * Main functionalities include:

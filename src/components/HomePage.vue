@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * @file HomePage.vue
+ * @module HomePage
  * @description The public landing page and main entry point of the U-Health application.
  * * This component serves as the initial touchpoint for users and is responsible for:
  * 1. Branding: Presenting the U-Health mission and value proposition.

@@ -1,4 +1,5 @@
 /**
+ * @module api
  * @file api.ts
  * @description Central API configuration for the U-Health Frontend.
  * * This module initializes a custom Axios instance tailored for communication with the Laravel backend.
@@ -17,7 +18,7 @@ import axios from 'axios'
  * Custom Axios instance with pre-defined configuration.
  * Sets the default base URL and mandatory JSON headers.
  */
-const api = axios.create({
+export const api = axios.create({
   baseURL: 'http://localhost:8000/api',
   headers: {
     'Accept': 'application/json',

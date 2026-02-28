@@ -1,4 +1,5 @@
 /**
+ * @module router
  * @file router/index.ts
  * @description Central Routing Module for the U-Health Application.
  * * This module defines the application's navigation structure and implements
@@ -98,7 +99,7 @@ const routes: RouteRecordRaw[] = [
  * Router Instance Initialization.
  * Uses Web History mode for clean URLs without hashes.
  */
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
