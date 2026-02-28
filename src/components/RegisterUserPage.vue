@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * @file RegisterUserPage.vue
- * @description User Onboarding/Registration interface for the U-Health platform.
+ * @description User Registration interface for the U-Health platform.
  * * This component manages the creation of new patient accounts.
  * Core responsibilities include:
  * 1. Data Collection: Capturing personal details (Name, Age, Sex, Location) and account credentials.

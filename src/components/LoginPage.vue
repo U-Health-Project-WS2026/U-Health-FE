@@ -4,11 +4,12 @@
  * @description Authentication gateway for the U-Health application.
  * * This component provides a secure interface for users to access their accounts.
  * Core functionalities include:
- * 1. User Authentication: Submits credentials to the Laravel Sanctum backend.
- * 2. Session Management: Securely stores the retrieved Opaque Token in LocalStorage.
- * 3. Error Handling: Intercepts and displays specific API error messages (e.g., invalid credentials).
- * 4. UX States: Manages loading indicators and prevents multiple simultaneous login attempts.
- * 5. Navigation: Provides entry points for registration and a mockup for password recovery.
+ * 1. User Authentication: Submits credentials to the Laravel Sanctum backend for Opaque Token retrieval.
+ * 2. Integrated Reset Flow: Implements the 'Forgot Password' trigger directly within the login context.
+ * 3. Session Management: Securely stores the retrieved Opaque Token in LocalStorage.
+ * 4. Reactive Feedback: Handles both success (reset link sent) and error (invalid credentials) states dynamically.
+ * 5. UX States: Manages loading indicators and prevents multiple simultaneous login attempts.
+ * 6. Lifecycle Navigation: Automatic redirection to the Dashboard upon successful handshake.
  * * @author [Christopher Herlitz]
  * @version 1.1.0
  */

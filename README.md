@@ -5,9 +5,9 @@
 ---
 
 ## Project Metadata
-* **User Frontend Developed by:** Christopher Herlitz
+* **Patient/User Frontend Developed by:** Christopher Herlitz
 * **Admin Frontend Developed by:** Evin Yilmaz
-* **Backend Developed by:** Sebastian Kohrell, Emir
+* **Backend Developed by:** Sebastian Kohrell, Muhammed Emir Akgül, Paul Lopatin
 
 
 * **Submission Date:** 28th February 2026
@@ -138,7 +138,7 @@ To run the application locally, follow these steps to initialize both the databa
 
 <img src="src/assets/RegisterUser.png" alt="LoginPage" width="400"/>
 
-*The centralized login interface with integrated password recovery flow.*
+*Account Creation: Detailed demographic and security fields ensuring accurate medical record synchronization.*
 
 * **Registration:** New users must sign up via the `/register` page. All fields (including demographic data) are required for medical record accuracy.
 

@@ -8,7 +8,7 @@
  * 3. Authentication-Aware UI: Displaying specific links (Dashboard vs. Login) and the
  * Profile button based on the user's authentication state and route meta tags.
  * 4. Dynamic Content Rendering: Providing the main `<router-view />` for page transitions.
- * 5. Global Footer: Displaying consistent branding, legal links, and security badges.
+ * 5. Global Footer: Displaying consistent branding and legal links.
  * * @requires vue-router - For route-based conditional rendering and navigation.
  */
 
