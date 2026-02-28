@@ -1,11 +1,15 @@
 # U-Health – Patient Management System (Frontend)
 
-**U-Health** is a professional-grade Single-Page Application (SPA) designed to digitize the patient experience. It allows users to securely manage medical appointments, track treatment histories, and access clinical reports through a modern, responsive interface.
+**U-Health** is a professional-grade Single-Page Application (SPA) designed to digitize the patient experience. It allows users to securely manage medical appointments and track treatment histories through a modern, responsive interface.
 
 ---
 
 ## Project Metadata
-* **Developed by:** [Christopher Herlitz, ...]
+* **User Frontend Developed by:** Christopher Herlitz
+* **Admin Frontend Developed by:** Evin Yilmaz
+* **Backend Developed by:** Sebastian Kohrell, Emir
+
+
 * **Submission Date:** 28th February 2026
 * **University:** [Universität Tübingen]
 * **Course:** [Praktische Informatik 4 - Teamprojekt]
@@ -39,14 +43,41 @@ Security is a core pillar of the U-Health interface:
 To run the application locally, follow these steps to initialize both the database and the frontend.
 
 ### 1. Prerequisites
+
+* Clone **U-Health-BE** and **U-Health-FE** in your chosen local directory
 * **PHP** (v8.2+) & **Composer**
 * **Node.js** (v18+) & **npm**
 * **MySQL** & **Mailtrap**
 
+
 ### 2. Backend Initialization (Laravel)
 1.  Navigate to the backend directory.
-2.  Install dependencies: `composer install`
-3.  Configure your `.env` file with your MySQL credentials:
+2.  Run **MySQL-Client** anc create database:
+    ```sh
+    mysql -u root
+    mysql> SHOW DATABASES;
+    mysql> create DATABASE u_health_db;
+    mysql> use u_health_db;
+    ```
+
+3.  Open a new Terminal Tab for **PHP**
+4.  Install dependencies: 
+    ```sh
+    cp .env.example .env
+    composer install
+    php artisan key:generate
+    ```
+3. Run migrations in the database:
+    ```sh
+    php artisan migrate
+    php artisan config:clear
+    ```
+4. Start the server:
+    ```sh
+    php artisan serve
+    ```
+
+5.  Configure your `.env` file with your MySQL credentials:
     ```env
     APP_URL=http://localhost:8000
     FRONTEND_URL=http://localhost:5173
@@ -64,22 +95,15 @@ To run the application locally, follow these steps to initialize both the databa
     MAIL_SCHEME=null
     MAIL_HOST=sandbox.smtp.mailtrap.io
     MAIL_PORT=2525
-    MAIL_USERNAME=31aa19ac3b8042
-    MAIL_PASSWORD=6d0962e0d74012
+    MAIL_USERNAME=<username>
+    MAIL_PASSWORD=<password>
     MAIL_FROM_ADDRESS="u-health-team@example.com"
     MAIL_FROM_NAME="LARAVEL"
     ```
-4.  Run migrations and seed the database:
-    ```sh
-    php artisan migrate --seed
-    ```
-5.  Start the server:
-    ```sh
-    php artisan serve
-    ```
 
-### 3. Frontend Initialization (Vue.js)
-1.  Navigate to the `vue-ui` folder.
+
+### 3. Patient Frontend Initialization (Vue.js)
+1.  Navigate to the `U-Health-FE` folder.
 2.  Install packages: `npm install`
 3.  Run the development server:
     ```sh
@@ -108,7 +132,7 @@ To run the application locally, follow these steps to initialize both the databa
 
 ### 2. Account Access & Security
 
-<img src="src/assets/LoginUser.png" alt="LoginPage" width="250"/>
+<img src="src/assets/LoginUser.png" alt="LoginPage" width="220"/>
 
 *The centralized login interface with integrated password recovery flow.*
 

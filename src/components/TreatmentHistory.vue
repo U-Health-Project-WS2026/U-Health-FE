@@ -173,7 +173,7 @@ const formatList = (items: any[] | undefined): string => {
         </div>
 
         <div class="col-md-4 col-lg-3">
-          <label class="small fw-bold text-secondary mb-1">Filter by Treatment</label>
+          <label class="small fw-bold text-secondary mb-1">Filter by Treatment Type</label>
           <div class="input-group shadow-sm rounded-3 overflow-hidden">
             <span class="input-group-text bg-white border-0"><i class="bi bi-search"></i></span>
             <input v-model="searchQuery" type="text" class="form-control border-0 p-2" placeholder="e.g. Biopsy...">
